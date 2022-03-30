@@ -3,23 +3,39 @@ import logo from "../assets/logo-trackit.png";
 import styled from "styled-components";
 import { useContext, useEffect } from "react";
 import { LoginContext } from "../contexts/LoginContext";
+import axios from "axios";
 
 export default function LoginPage() {
-  const { emailLogin, setEmailLogin, passwordLogin, setPasswordLogin } =
-    useContext(LoginContext);
-  const user = JSON.parse(localStorage.getItem("user"));
+  const {
+    emailLogin,
+    setEmailLogin,
+    passwordLogin,
+    setPasswordLogin,
+    setUser,
+    user,
+  } = useContext(LoginContext);
+  const userLocal = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
-    if (user) {
-      setEmailLogin(user.email);
-      setPasswordLogin(user.password);
+    if (userLocal) {
+      setEmailLogin(userLocal.email);
+      setPasswordLogin(userLocal.password);
     }
-  }, [user, setEmailLogin, setPasswordLogin]);
+  }, [userLocal, setEmailLogin, setPasswordLogin]);
 
   function login(e) {
     e.preventDefault();
     const baseURL =
       "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/auth/login";
+    const promise = axios.post(baseURL, {
+      email: emailLogin,
+      password: passwordLogin,
+    });
+    promise.then((res) => {
+      console.log(res);
+      setUser({ ...res.data });
+      console.log(user);
+    });
   }
 
   return (

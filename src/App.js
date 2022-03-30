@@ -13,7 +13,7 @@ export default function App() {
   const [image, setImage] = useState();
   const [emailLogin, setEmailLogin] = useState();
   const [passwordLogin, setPasswordLogin] = useState();
-  const [token, setToken] = useState();
+  const [user, setUser] = useState();
 
   return (
     <BrowserRouter>
@@ -31,6 +31,8 @@ export default function App() {
           setEmailLogin,
           passwordLogin,
           setPasswordLogin,
+          setUser,
+          user,
         }}
       >
         <Routes>
@@ -38,7 +40,7 @@ export default function App() {
           <Route path="/cadastro" element={<RegisterPage />} />
         </Routes>
       </LoginContext.Provider>
-      <UserContext.Provider value={{ token, setToken }}>
+      <UserContext.Provider value={{ user }}>
         <Routes></Routes>
       </UserContext.Provider>
     </BrowserRouter>
