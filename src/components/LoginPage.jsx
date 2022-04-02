@@ -36,7 +36,6 @@ export default function LoginPage() {
         password: passwordLogin,
       });
       promise.then((res) => {
-        console.log(res);
         setUser({ ...res.data });
         setLoading(false);
         localStorage.setItem(
@@ -56,7 +55,6 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (localUser && !loggedIn) {
-      console.log("oi");
       setLoggedIn(true);
       login();
     }
