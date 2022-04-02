@@ -3,7 +3,7 @@ import logo from "../assets/logo-trackit.png";
 import { Main, Img, Form, Input, Button, P } from "./LoginPage";
 import axios from "axios";
 import { useContext } from "react";
-import { LoginContext } from "../contexts/LoginContext";
+import { UserContext } from "../contexts/UserContext";
 
 export default function RegisterPage() {
   const {
@@ -15,7 +15,7 @@ export default function RegisterPage() {
     setName,
     image,
     setImage,
-  } = useContext(LoginContext);
+  } = useContext(UserContext);
 
   const navigate = useNavigate();
 
@@ -73,7 +73,7 @@ export default function RegisterPage() {
         <Button type="submit">Cadastrar</Button>
       </Form>
       <Link to="/">
-        <P>Já tem uma conta? Faça login!</P>
+        <P>Já tem uma conta? Faça User!</P>
       </Link>
     </Main>
   );
