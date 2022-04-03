@@ -24,6 +24,7 @@ export default function App() {
   const [user, setUser] = useState();
   const [loggedIn, setLoggedIn] = useState(false);
   const [percentage, setPercentage] = useState(30);
+  const [habits, setHabits] = useState([]);
 
   return (
     <UserContext.Provider
@@ -47,6 +48,8 @@ export default function App() {
         setLoggedIn,
         percentage,
         setPercentage,
+        habits,
+        setHabits,
       }}
     >
       <BrowserRouter>
