@@ -4,12 +4,15 @@ import { Main } from "./TodayPage";
 import styled from "styled-components";
 import { useContext, useState } from "react";
 import { UserContext } from "../contexts/UserContext";
+import { ThreeDots } from "react-loader-spinner";
+import axios from "axios";
 
 export default function HabitsPage() {
   const { habits, setHabits, user } = useContext(UserContext);
   const [creatingHabit, setCreatingHabit] = useState(false);
   const [newHabitName, setNewHabitName] = useState("");
   const [newHabitDays, setNewHabitDays] = useState([]);
+  const [loading, setLoading] = useState(false);
   const weekDays = [
     { num: 0, day: "D" },
     { num: 1, day: "S" },
@@ -19,6 +22,29 @@ export default function HabitsPage() {
     { num: 5, day: "S" },
     { num: 6, day: "S" },
   ];
+
+  function createHabit() {
+    setLoading(true);
+    const URL =
+      "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits";
+    const TOKEN = user.token;
+    const object = {
+      name: newHabitName,
+      days: newHabitDays,
+    };
+    const config = {
+      headers: { Authorization: `Bearer ${TOKEN}` },
+    };
+    const promise = axios.post(URL, object, config);
+    promise.then((res) => {
+      console.log(res);
+      setLoading(false);
+    });
+    promise.catch((err) => {
+      setLoading(false);
+      console.log(err);
+    });
+  }
 
   return (
     <>
@@ -32,25 +58,31 @@ export default function HabitsPage() {
         </TitleContainer>
         {creatingHabit ? (
           <CreateContainer>
-            <Input placeholder="nome do hábito"></Input>
+            <Input
+              color={loading ? "#AFAFAF" : "black"}
+              background={loading ? "#F2F2F2" : "white"}
+              pointer={loading ? "none" : "auto"}
+              value={newHabitName}
+              placeholder="nome do hábito"
+              onChange={(e) => setNewHabitName(e.target.value)}
+            ></Input>
             <Dias>
               {weekDays.map((obj) => {
                 const day = obj.day;
                 const num = obj.num;
                 return (
                   <Dia
-                    color={newHabitDays.includes(num) ? "#FFFFFF" : "#DBDBDB"}
+                    pointer={loading ? "none" : "auto"}
+                    color={newHabitDays.includes(num) ? "#FFFFFF" : "#CFCFCF"}
                     background={
-                      !newHabitDays.includes(num) ? "#FFFFFF" : "#DBDBDB"
+                      !newHabitDays.includes(num) ? "#FFFFFF" : "#CFCFCF"
                     }
                     key={`dia${num}`}
                     onClick={() => {
-                      console.log(day);
                       if (newHabitDays.includes(num)) {
                         const remainingDays = newHabitDays.filter(
                           (el) => el !== num
                         );
-                        console.log(remainingDays);
                         setNewHabitDays(remainingDays);
                       } else {
                         setNewHabitDays([...newHabitDays, num]);
@@ -62,6 +94,26 @@ export default function HabitsPage() {
                 );
               })}
             </Dias>
+            <CancelButton
+              opacity={loading ? "0.7" : "1"}
+              pointer={loading ? "none" : "auto"}
+              onClick={() => setCreatingHabit(false)}
+            >
+              Cancelar
+            </CancelButton>
+            <ConfirmButton
+              opacity={loading ? "0.7" : "1"}
+              pointer={loading ? "none" : "auto"}
+              onClick={() => createHabit()}
+            >
+              {loading ? (
+                <LoadingDiv>
+                  <ThreeDots color="white" height="35px" width="50px" />
+                </LoadingDiv>
+              ) : (
+                <p>Salvar</p>
+              )}
+            </ConfirmButton>
           </CreateContainer>
         ) : (
           <></>
@@ -138,13 +190,14 @@ const CreateContainer = styled.div`
   height: 180px;
   margin: 0 auto;
   margin-top: 20px;
+  position: relative;
 
   background: #ffffff;
   border-radius: 5px;
 `;
 
 const Input = styled.input`
-  background: #ffffff;
+  background: ${(props) => props.background};
   border: 1px solid #d5d5d5;
   box-sizing: border-box;
   border-radius: 5px;
@@ -152,13 +205,20 @@ const Input = styled.input`
   height: 45px;
   margin: 18px 18px 8px 19px;
 
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 19.976px;
+  line-height: 25px;
+  padding-left: 17px;
+
+  color: ${(props) => props.color};
+  pointer-events: ${(props) => props.pointer};
   ::placeholder {
     font-family: "Lexend Deca";
     font-style: normal;
     font-weight: 400;
     font-size: 19.976px;
-    padding-left: 17px;
-
     color: #dbdbdb;
   }
 `;
@@ -176,7 +236,7 @@ const Dia = styled.div`
   height: 30px;
 
   background: ${(props) => props.background};
-  border: 1px solid #d5d5d5;
+  border: 1px solid #cfcfcf;
   box-sizing: border-box;
   border-radius: 5px;
   margin-left: 4px;
@@ -190,8 +250,64 @@ const Dia = styled.div`
   font-weight: 400;
   font-size: 19.976px;
   color: ${(props) => props.color};
+  pointer-events: ${(props) => props.pointer};
 
   :first-of-type {
     margin-left: 0px;
+  }
+`;
+
+const CancelButton = styled.button`
+  font-family: "Lexend Deca";
+  font-style: normal;
+  font-weight: 400;
+  font-size: 15.976px;
+  line-height: 20px;
+  border: none;
+  background: none;
+  position: absolute;
+  bottom: 23px;
+  right: 123px;
+
+  text-align: center;
+
+  color: #52b6ff;
+  pointer-events: ${(props) => props.pointer};
+  opacity: ${(props) => props.opacity};
+`;
+
+const ConfirmButton = styled.button`
+  position: absolute;
+  width: 84px;
+  height: 35px;
+  bottom: 15px;
+  right: 16px;
+
+  background: #52b6ff;
+  border-radius: 4.63636px;
+  border: none;
+  pointer-events: ${(props) => props.pointer};
+  opacity: ${(props) => props.opacity};
+  p {
+    font-family: "Lexend Deca";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 15.976px;
+    text-align: center;
+    color: #ffffff;
+    position: relative;
+    bottom: 2px;
+  }
+`;
+
+const LoadingDiv = styled.div`
+  width: 100%;
+  height: 35px;
+
+  > div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 35px;
   }
 `;
