@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo-trackit.png";
 import styled from "styled-components";
-import { useContext, useState, useCallback, useEffect } from "react";
+import { useContext, useCallback, useEffect } from "react";
 import { UserContext } from "../contexts/UserContext";
 import axios from "axios";
 import { ThreeDots } from "react-loader-spinner";
@@ -17,9 +17,9 @@ export default function LoginPage() {
     localUser,
     loggedIn,
     setLoggedIn,
+    loading,
+    setLoading,
   } = useContext(UserContext);
-
-  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -50,7 +50,7 @@ export default function LoginPage() {
         localStorage.clear();
       });
     },
-    [emailLogin, navigate, passwordLogin, setUser]
+    [emailLogin, navigate, passwordLogin, setUser, setLoading]
   );
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export default function LoginPage() {
       setLoggedIn(true);
       login();
     }
-  }, [localUser, loggedIn, login, setLoggedIn]);
+  }, [localUser, loggedIn, login, setLoggedIn, setLoading]);
 
   return (
     <Main>

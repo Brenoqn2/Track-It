@@ -21,4 +21,6 @@ export const Main = styled.main`
   width: 100%;
   height: calc(100vh - 140px);
   position: fixed;
+
+  overflow-y: auto;
 `;

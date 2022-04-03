@@ -2,7 +2,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { Main } from "./TodayPage";
 import styled from "styled-components";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { UserContext } from "../contexts/UserContext";
 import { ThreeDots } from "react-loader-spinner";
 import axios from "axios";
@@ -23,27 +23,59 @@ export default function HabitsPage() {
     { num: 6, day: "S" },
   ];
 
+  useEffect(() => {
+    const URL =
+      "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits";
+    const TOKEN = user.token;
+    const config = {
+      headers: { Authorization: `Bearer ${TOKEN}` },
+    };
+    const promise = axios.get(URL, config);
+    promise.then((response) => {
+      setHabits(response.data);
+    });
+    promise.catch((error) => {
+      console.log(error);
+    });
+  }, [setHabits, user.token, loading]);
+
   function createHabit() {
     setLoading(true);
     const URL =
       "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits";
     const TOKEN = user.token;
-    const object = {
-      name: newHabitName,
-      days: newHabitDays,
-    };
     const config = {
       headers: { Authorization: `Bearer ${TOKEN}` },
     };
-    const promise = axios.post(URL, object, config);
-    promise.then((res) => {
-      console.log(res);
+    const data = {
+      name: newHabitName,
+      days: newHabitDays,
+    };
+    const promise = axios.post(URL, data, config);
+    promise.then(() => {
       setLoading(false);
+      setNewHabitName("");
+      setNewHabitDays([]);
+      setCreatingHabit(false);
     });
     promise.catch((err) => {
       setLoading(false);
       console.log(err);
     });
+  }
+
+  function deleteHabit(id) {
+    const URL = `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}`;
+    const TOKEN = user.token;
+    const config = {
+      headers: { Authorization: `Bearer ${TOKEN}` },
+    };
+    const promise = axios.delete(URL, config);
+    promise.then(() => {
+      const remainingHabits = habits.filter((habit) => habit.id !== id);
+      setHabits(remainingHabits);
+    });
+    promise.catch((err) => console.log(err));
   }
 
   return (
@@ -66,18 +98,18 @@ export default function HabitsPage() {
               placeholder="nome do hábito"
               onChange={(e) => setNewHabitName(e.target.value)}
             ></Input>
-            <Dias>
+            <Days>
               {weekDays.map((obj) => {
                 const day = obj.day;
                 const num = obj.num;
                 return (
-                  <Dia
+                  <Day
                     pointer={loading ? "none" : "auto"}
                     color={newHabitDays.includes(num) ? "#FFFFFF" : "#CFCFCF"}
                     background={
                       !newHabitDays.includes(num) ? "#FFFFFF" : "#CFCFCF"
                     }
-                    key={`dia${num}`}
+                    key={`Day${num}`}
                     onClick={() => {
                       if (newHabitDays.includes(num)) {
                         const remainingDays = newHabitDays.filter(
@@ -90,10 +122,10 @@ export default function HabitsPage() {
                     }}
                   >
                     {day}
-                  </Dia>
+                  </Day>
                 );
               })}
-            </Dias>
+            </Days>
             <CancelButton
               opacity={loading ? "0.7" : "1"}
               pointer={loading ? "none" : "auto"}
@@ -124,7 +156,48 @@ export default function HabitsPage() {
             começar a trackear!
           </Warning>
         ) : (
-          <h1>xd</h1>
+          habits.map((habit) => {
+            return (
+              <Habit key={habit.id}>
+                <p>{habit.name}</p>
+                <ion-icon
+                  name="trash-outline"
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        "Tem certeza que deseja excluir esse hábito?"
+                      )
+                    )
+                      deleteHabit(habit.id);
+                  }}
+                ></ion-icon>
+                <Days>
+                  {weekDays.map((obj) => {
+                    const day = obj.day;
+                    const num = obj.num;
+                    let color = "";
+                    let background = "";
+                    if (habit.days.includes(num)) {
+                      color = "#FFFFFF";
+                      background = "#CFCFCF";
+                    } else {
+                      color = "#CFCFCF";
+                      background = "#FFFFFF";
+                    }
+                    return (
+                      <Day
+                        color={color}
+                        background={background}
+                        key={habit.id + "day" + num}
+                      >
+                        {day}
+                      </Day>
+                    );
+                  })}
+                </Days>
+              </Habit>
+            );
+          })
         )}
       </Main>
       <Footer />
@@ -223,7 +296,7 @@ const Input = styled.input`
   }
 `;
 
-const Dias = styled.div`
+const Days = styled.div`
   width: 303px;
   height: 30px;
   margin: 0 auto;
@@ -231,7 +304,7 @@ const Dias = styled.div`
   align-items: center;
 `;
 
-const Dia = styled.div`
+const Day = styled.div`
   width: 30px;
   height: 30px;
 
@@ -309,5 +382,50 @@ const LoadingDiv = styled.div`
     justify-content: center;
     align-items: center;
     height: 35px;
+  }
+`;
+
+const Habit = styled.div`
+  width: 340px;
+  height: 91px;
+  margin: 0 auto;
+  margin-top: 10px;
+  position: relative;
+
+  background: #ffffff;
+  border-radius: 5px;
+
+  :first-child {
+    margin-top: 20px;
+  }
+
+  :last-child {
+    margin-bottom: 35px;
+  }
+
+  ion-icon {
+    position: absolute;
+    right: 10px;
+    top: 11px;
+    font-size: 15px;
+  }
+
+  p {
+    font-family: "Lexend Deca";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 19.976px;
+
+    color: #666666;
+
+    position: absolute;
+    top: 13px;
+    left: 15px;
+  }
+
+  > div {
+    position: absolute;
+    bottom: 15px;
+    left: 14px;
   }
 `;
