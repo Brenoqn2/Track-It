@@ -258,23 +258,12 @@ const Warning = styled.div`
   color: #666666;
 `;
 
-const CreateContainer = styled.div`
-  width: 340px;
-  height: 180px;
-  margin: 0 auto;
-  margin-top: 20px;
-  position: relative;
-
-  background: #ffffff;
-  border-radius: 5px;
-`;
-
 const Input = styled.input`
   background: ${(props) => props.background};
   border: 1px solid #d5d5d5;
   box-sizing: border-box;
   border-radius: 5px;
-  width: 303px;
+  width: 90%;
   height: 45px;
   margin: 18px 18px 8px 19px;
 
@@ -427,5 +416,21 @@ const Habit = styled.div`
     position: absolute;
     bottom: 15px;
     left: 14px;
+  }
+`;
+
+const CreateContainer = styled.div`
+  width: 90%;
+  margin: 0 auto;
+  height: 180px;
+  margin: 0 auto;
+  margin-top: 20px;
+  position: relative;
+
+  background: #ffffff;
+  border-radius: 5px;
+
+  > div {
+    margin-left: 19px;
   }
 `;
