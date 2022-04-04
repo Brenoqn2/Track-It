@@ -23,7 +23,7 @@ export default function App() {
   );
   const [user, setUser] = useState();
   const [loggedIn, setLoggedIn] = useState(false);
-  const [percentage, setPercentage] = useState(30);
+  const [percentage, setPercentage] = useState(0);
   const [habits, setHabits] = useState([]);
   const [loading, setLoading] = useState(false);
 

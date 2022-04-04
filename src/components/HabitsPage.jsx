@@ -386,7 +386,7 @@ const LoadingDiv = styled.div`
 `;
 
 const Habit = styled.div`
-  width: 340px;
+  width: 90%;
   height: 91px;
   margin: 0 auto;
   margin-top: 10px;
