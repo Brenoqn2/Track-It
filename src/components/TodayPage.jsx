@@ -225,9 +225,17 @@ const Habit = styled.div`
   width: 100%;
   height: 94px;
   background: #fff;
-  margin-top: 28px;
+  margin-top: 10px;
   position: relative;
   border-radius: 5px;
+
+  :first-of-type {
+    margin-top: 28px;
+  }
+
+  :last-of-type {
+    margin-bottom: 40px;
+  }
 
   div {
     position: absolute;
