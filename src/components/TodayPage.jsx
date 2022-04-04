@@ -2,7 +2,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import styled from "styled-components";
 import dayjs from "dayjs";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useCallback } from "react";
 import { UserContext } from "../contexts/UserContext";
 import axios from "axios";
 import checkMark from "../assets/checkmark.png";
@@ -72,7 +72,7 @@ export default function TodayPage() {
 
   const [todayHabits, setTodayHabits] = useState([]);
 
-  useEffect(() => {
+  const getTodayHabits = useCallback(() => {
     const URL =
       "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/today";
     const TOKEN = user.token;
@@ -87,6 +87,41 @@ export default function TodayPage() {
       console.log(error);
     });
   }, [user.token]);
+
+  useEffect(() => getTodayHabits(), [user.token, getTodayHabits]);
+
+  useEffect(() => {
+    if (todayHabits !== null) {
+      let count = 0;
+      todayHabits.forEach((habit) => {
+        if (habit.done) count++;
+      });
+      if (count !== 0) {
+        const newPercentage = (count / todayHabits.length) * 100;
+        setPercentage(Math.round(newPercentage));
+      } else {
+        setPercentage(0);
+      }
+    }
+  }, [todayHabits, setPercentage]);
+
+  function checkHabit(done, id) {
+    let URL;
+    if (!done) {
+      URL = `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}/check`;
+    } else {
+      URL = `https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/${id}/uncheck`;
+    }
+    const TOKEN = user.token;
+    const config = {
+      headers: { Authorization: `Bearer ${TOKEN}` },
+    };
+    const promise = axios.post(URL, {}, config);
+    promise.then(() => {
+      getTodayHabits();
+    });
+    promise.catch((error) => console.log(error));
+  }
 
   return (
     <>
@@ -112,9 +147,22 @@ export default function TodayPage() {
                   </Strong>
                 </p>
                 <p>
-                  Seu recorde: <Strong>{habit.highestSequence} dias</Strong>
+                  Seu recorde:{" "}
+                  <Strong
+                    color={
+                      habit.currentSequence === habit.highestSequence &&
+                      habit.currentSequence !== 0
+                        ? "#8fc549"
+                        : "#666666"
+                    }
+                  >
+                    {habit.highestSequence} dias
+                  </Strong>
                 </p>
                 <CheckMarkContainer
+                  onClick={() => {
+                    checkHabit(habit.done, habit.id);
+                  }}
                   background={habit.done ? "#8fc549" : "#EBEBEB"}
                 >
                   <img src={checkMark} alt="" />
